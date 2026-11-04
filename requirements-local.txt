@@ -1,0 +1,8 @@
+# Dependencies for app_local.py only. No OpenAI API key is required.
+gitingest
+streamlit
+pandas
+llama-index
+llama-index-llms-ollama
+llama-index-embeddings-huggingface
+huggingface-hub

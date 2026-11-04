@@ -1,0 +1,14 @@
+# Local Python environments
+.venv/
+.venv-1/
+
+# Secrets and local configuration
+.env
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+
+# Local agent/tool settings
+.agents/
+.claude/
