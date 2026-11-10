@@ -1,120 +1,58 @@
-
 # GitHub RAG Assistant
 
-A Streamlit application that lets users explore public GitHub repositories using Retrieval-Augmented Generation (RAG).
+An AI-powered assistant that indexes public GitHub repositories and answers questions using retrieval-augmented generation.
 
-This is an adapted learning project based on an existing GitHub-RAG implementation. It focuses on understanding and configuring repository ingestion, document indexing, semantic retrieval, and local LLM inference.
+## Architecture
 
-## How it works
+- **Ingestion:** shallow Git clone of a public repository.
+- **File-aware documents:** each supported source file retains its path and GitHub URL metadata.
+- **Chunking:** LlamaIndex `SentenceSplitter`.
+- **Embeddings:** `BAAI/bge-small-en-v1.5`.
+- **Vector store:** persistent ChromaDB.
+- **Generation:** local Ollama model (`llama3.2` by default).
+- **Interface:** Streamlit.
+- **Tests:** pytest.
 
-1. Enter a public GitHub repository URL.
-2. GitIngest extracts repository content and file structure.
-3. LlamaIndex processes the content and builds a vector index.
-4. Relevant repository context is retrieved based on the user's question.
-5. Ollama generates an answer using the retrieved context.
+## Requirements
 
-## Technology stack
+Python 3.11, Git, Ollama, and a local Ollama model such as `llama3.2`.
 
-- Python
-- Streamlit
-- GitIngest
-- LlamaIndex
-- Ollama (`llama3.2`)
-- Hugging Face sentence embeddings
-
-## Run locally
-
-### Prerequisites
-
-- Python 3.10 or newer
-- [Ollama](https://ollama.com/) installed and running
-- Sufficient memory to run the selected local model
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/Amitesh2876/github-rag-project.git
-cd github-rag-project
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv .venv
-```
-
-Windows PowerShell:
+## Setup (Windows PowerShell)
 
 ```powershell
-.venv\Scripts\Activate.ps1
-```
-
-macOS/Linux:
-
-```bash
-source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements-local.txt
-```
-
-### 4. Download the model
-
-```bash
+py -3.11 -m venv .venv-rag
+.\.venv-rag\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ollama pull llama3.2
 ```
 
-Ensure Ollama is running before starting the application.
+## Run
 
-### 5. Run the application
-
-```bash
-streamlit run app_local.py
+```powershell
+streamlit run app.py
 ```
 
-Open the local URL displayed in the terminal, enter a public GitHub repository URL, and select **Load repository** to begin.
+Enter a public repository URL and select **Index repository**.
 
-## Project structure
+## Tests
 
-```text
-github-rag-project/
-├── app_local.py
-├── app.py
-├── requirements-local.txt
-├── requirements.txt
-├── .env.example
-├── .gitignore
-└── README.md
+```powershell
+python -m pytest -q
 ```
 
-`app_local.py` is the recommended entry point for local execution. `app.py` is the alternate API-oriented implementation retained from the starter project.
+## Initial ingestion limits
 
-## Current limitations
+The loader indexes up to 500 supported text files, with a 256 KB per-file limit and a 20 MB total text budget. It skips common generated, environment, and dependency directories. Limits are defined in `src/config.py`.
 
-- Supports public GitHub repositories only.
-- Large repositories may require additional ingestion and indexing time.
-- Generated answers may be incomplete or inaccurate and should be verified against the source code.
-- The vector index is stored in memory and must be rebuilt when a new session starts.
+## Roadmap
 
-## Future improvements
+- Labelled retrieval evaluation dataset and Precision@K / Recall@K.
+- Answer faithfulness and citation correctness evaluation.
+- Caching and incremental re-indexing.
+- Private repository authentication.
+- More code-aware chunking and repository filters.
 
-- Persistent vector storage.
-- Better file filtering and code-aware chunking.
-- Source references in generated answers.
-- Support for private repositories.
-- Automated testing and improved retrieval accuracy.
+## Limitations
 
-## Credits and attribution
-
-This project adapts an existing GitHub-RAG tutorial/implementation and uses the following open-source technologies:
-
-- [GitIngest](https://github.com/cyclotruc/gitingest)
-- [LlamaIndex](https://github.com/run-llama/llama_index)
-- [Streamlit](https://github.com/streamlit/streamlit)
-- [Ollama](https://github.com/ollama/ollama)
-- [Hugging Face](https://github.com/huggingface)
-
-Please preserve applicable upstream licenses and copyright notices when modifying or redistributing source code.
+This is an initial local prototype. It supports public repositories, requires a working local Ollama service, and does not yet perform incremental indexing. Do not claim benchmark performance until a repeatable evaluation has been run.

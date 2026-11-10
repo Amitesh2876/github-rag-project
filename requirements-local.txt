@@ -1,5 +1,0 @@
-streamlit
-gitingest
-llama-index-core
-llama-index-llms-ollama
-llama-index-embeddings-huggingface
